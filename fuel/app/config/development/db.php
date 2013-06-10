@@ -6,9 +6,12 @@
 return array(
 	'default' => array(
 		'connection'  => array(
-			'dsn'        => 'mysql:host=localhost;dbname=fuel_dev',
-			'username'   => 'root',
-			'password'   => 'root',
+			'dsn'        => 'mysql:host=49.212.133.30;dbname=planet_meister',
+			'username'   => 'niimura',
+			'password'   => 'w8SZxE3l',
+			//'dsn'        => 'mysql:host=localhost;dbname=planet_meister',
+			//'username'   => 'niimura',
+			//'password'   => 'niimura',
 		),
 	),
 );
