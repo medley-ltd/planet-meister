@@ -23,7 +23,7 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
      */
     public function get($nico_id){
         
-        return self::find('all',array('where' => $nico_id));
+        return self::find_by('nico_id', $nico_id);
         
     }
     
