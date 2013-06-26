@@ -13,7 +13,37 @@
 class Model_UserData extends \Fuel\Core\Model_Crud {
     //put your code here
     protected static $_table_name = 'user_data';
-    protected static $_primary_key = 'id';
+    protected static $_primary_key = 'nico_id';
+    
+    protected static $_properties = array(
+        'nico_id' ,
+        'name' ,
+        'level' ,
+        'exp' ,
+        'sap_money' , 
+        'money' ,
+        'now_stamina' ,
+        'max_stamina' ,
+        'stamina_last_recovery_date' ,
+        'status_pt' ,
+        'remaining_status_pt' ,
+        'friend_count' ,
+        'friend_max_count' ,
+        'base_hp' ,
+        'base_mp' ,
+        'base_att' ,
+        'base_spd' ,
+        'base_def' ,
+        'base_wis' ,
+        'current_job_id' ,
+        'tutrial' ,
+        'login_bonus_get_date' ,
+        'profile_comment' ,
+        'last_login_date' ,
+        'update_date' ,
+        'insert_date'
+    );
+    
     
     /*
      * get()
@@ -22,13 +52,16 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
      * nimu.co
      */
     public function get($nico_id){
-        
-        return self::find_by('nico_id', $nico_id);
+        $ret = self::find_by('nico_id', $nico_id);
+        if(!$ret){
+            //return false;
+        }
+        return $ret[0];
         
     }
     
     /*
-     * entry()
+     * update()
      * ユーザーデータを登録する
      * @param $nico_id int
      * nimu.co
@@ -50,45 +83,154 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
             return false;
         }
     }
+    
+    
     /*
-     * update()
-     * ユーザーデータを登録する
+     * levelup()
+     * レベルアップ
      * @param $nico_id int
      * nimu.co
      */
     public function update($user_param_array){
-        $user = self::find_by_pk($user_param_array['nico_id']);
+    
+        //nico_idのチェック
+        if(isset($user_param_array['nico_id'])){
+            if(!$user_param_array['nico_id']){
+                return false;
+            }
+        }else{
+            return false;
+        }
+
+        //対象ユーザーのuser_dataを取得
+        //$user_dt = $this->get($user_param_array['nico_id']);
         
-        /*$user->set(array(
-            'name' => $user_param_array['name'],
-            'level' => $user_param_array[''],
-            'exp' => $user_param_array[''],
-            'sap_money'=> $user_param_array[''],
-            'money'=> $user_param_array[''],
-            'now_stamina'=> $user_param_array[''],
-            'max_stamina'=> $user_param_array[''],
-            'friend_count'=> $user_param_array[''],
-            'friend_max_count'=> $user_param_array[''],
-            'base_hp'=> $user_param_array[''],
-            'base_mp'=> $user_param_array[''],
-            'base_att'=> $user_param_array[''],
-            'base_spd'=> $user_param_array[''],
-            'base_def'=> $user_param_array[''],
-            'base_wis'=> $user_param_array[''],
-            'current_job_id'=> $user_param_array[''],
-            'current_avatar_id'=> $user_param_array[''],
-            'current_weapon_id'=> $user_param_array[''],
-            'profile_comment'=> $user_param_array[''],
-            'last_login_date'=> $user_param_array[''],
-            'update_date' => now(),
-            'insert_date' => now(),
-           
-        ));
-        */
-        $user->set($user_param_array);
-        return $user->save();
-                
+        $query = Fuel\Core\DB::update('user_data');
+
+        //なまえ更新
+        if(isset($user_param_array['name'])){
+            $query->value('name',$user_param_array['name']);
+        }
+
+        //EXP更新
+        if(isset($user_param_array['exp'])){
+            $query->value('exp', $user_param_array['exp']);
+        }
+
+        //課金額更新
+        if(isset($user_param_array['sap_money'])){
+            $query->value('sap_money',$user_param_array['sap_money']);
+        }
+
+        //ゲーム内マネー更新
+        if(isset($user_param_array['money'])){
+            $query->value('money',$user_param_array['money']);
+        }
+
+        //現在スタミナ更新
+        if(isset($user_param_array['now_stamina'])){
+            $query->value('now_stamina',$user_param_array['now_stamina']);
+        }
+        
+        //最大スタミナ更新 LV-UP時
+        if(isset($user_param_array['max_stamina'])){
+            $query->value('max_stamina',$user_param_array['max_stamina']);
+        }
+
+        //スタミナ最終回復時刻更新
+        if(isset($user_param_array['stamina_last_recovery_date'])){
+            $query->value('stamina_last_recovery_date',$user_param_array['stamina_last_recovery_date']);
+        }
+        
+        //ST-pt更新
+        if(isset($user_param_array['status_pt'])){
+            $query->value('status_pt',$user_param_array['status_pt']);
+        }
+
+        //残りST-pt更新
+        if(isset($user_param_array['remaining_status_pt'])){
+            $query->value('remaining_status_pt',$user_param_array['remaining_status_pt']);
+        }
+
+        //フレンド数更新
+        if(isset($user_param_array['friend_count'])){
+            $query->value('friend_count',$user_param_array['friend_count']);
+        }
+        
+        //フレンド最大数更新
+        if(isset($user_param_array['friend_max_count'])){
+            $query->value('friend_max_count',$user_param_array['friend_max_count']);
+        }
+        
+        //基本HP更新
+        if(isset($user_param_array['base_hp'])){
+            $query->value('base_hp',$user_param_array['base_hp']);
+        }
+
+        //基本MP更新
+        if(isset($user_param_array['base_mp'])){
+            $query->value('base_mp',$user_param_array['base_mp']);
+        }
+        
+        //基本att更新
+        if(isset($user_param_array['base_att'])){
+            $query->value('base_att',$user_param_array['base_att']);
+        }
+        
+        //基本spd更新
+        if(isset($user_param_array['base_spd'])){
+            $query->value('base_spd',$user_param_array['base_spd']);
+        }
+        
+        //基本def更新
+        if(isset($user_param_array['base_def'])){
+            $query->value('base_def',$user_param_array['base_def']);
+        }
+
+        //基本wis更新
+        if(isset($user_param_array['base_wis'])){
+            $query->value('base_wis',$user_param_array['base_wis']);
+        }
+
+        //現在job-id更新
+        if(isset($user_param_array['current_job_id'])){
+            $query->value('current_job_id',$user_param_array['current_job_id']);
+        }
+
+        //チュートリアルステータス更新
+        if(isset($user_param_array['tutrial'])){
+            $query->value('tutrial',$user_param_array['tutrial']);
+        }
+
+        //ログインボーナス更新
+        if(isset($user_param_array['login_bonus_get_date'])){
+            $query->value('login_bonus_get_date',$user_param_array['login_bonus_get_date']);
+        }
+
+        //プロフィール更新
+        if(isset($user_param_array['profile_comment'])){
+            $query->value('profile_comment',$user_param_array['profile_comment']);
+        }
+
+        //最終ログイン日時更新
+        if(isset($user_param_array['last_login_date'])){
+            $query->value('last_login_date',$user_param_array['last_login_date']);
+        }
+        
+        //更新日付の更新
+        $query->value('update_date',date('Y-m-d H:i:s'));
+        
+        //where条件
+        $query->where('nico_id',$user_param_array['nico_id']);
+        
+        //SQL実行
+        $result = $query->execute();
+
+        return $result;
+        
     }
+    
+    
 }
 
 ?>

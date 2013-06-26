@@ -16,7 +16,33 @@
  */
 
 return array(
-
+       /**
+        * アプリケーションの文字コード
+        */
+        'encoding' => 'UTF-8' ,
+        /**
+        * アプリケーションのデフォルト言語
+        */
+        'language' => 'ja' ,
+       /**
+        * charset header設定
+        */
+        'default_charset' => 'Shift-jis' ,
+        /**
+        * mimetype header設定
+        */
+        'default_mimetype' => 'text/html' ,
+        /**
+        * 文字コード関連設定
+        */
+        'mbstring' => array (
+               'language'             => 'Japanese' ,
+               'internal_encoding'    => 'UTF-8' ,
+               'script_encoding'      => 'UTF-8' ,
+               'http_input'           => 'pass' ,
+               'http_output'          => 'sjis' ,
+               'substitute_character' => 'none' ,
+),
 	/**
 	 * base_url - The base URL of the application.
 	 * MUST contain a trailing slash (/)
@@ -242,11 +268,10 @@ return array(
 	// 	//PKGPATH
 	// ),
 
-
 	/**************************************************************************/
 	/* Always Load                                                            */
 	/**************************************************************************/
-	// 'always_load'  => array(
+	 'always_load'  => array(
 
 		/**
 		 * These packages are loaded on Fuel's startup.
@@ -259,9 +284,10 @@ return array(
 		 *     array('auth'	=> PKGPATH.'auth/')
 		 * );
 		 */
-		// 'packages'  => array(
-		// 	//'orm',
-		// ),
+		 'packages'  => array(
+		 	'orm',
+		 	'log',
+		 ),
 
 		/**
 		 * These modules are always loaded on Fuel's startup. You can specify them
@@ -297,6 +323,11 @@ return array(
 		 * If you don't want the lang in a group use null as groupname.
 		 */
 		// 'language'  => array(),
-	// ),
+
+         
+         
+         
+         
+         ),
 
 );
