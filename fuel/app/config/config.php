@@ -16,33 +16,7 @@
  */
 
 return array(
-       /**
-        * アプリケーションの文字コード
-        */
-        'encoding' => 'UTF-8' ,
-        /**
-        * アプリケーションのデフォルト言語
-        */
-        'language' => 'ja' ,
-       /**
-        * charset header設定
-        */
-        'default_charset' => 'Shift-jis' ,
-        /**
-        * mimetype header設定
-        */
-        'default_mimetype' => 'text/html' ,
-        /**
-        * 文字コード関連設定
-        */
-        'mbstring' => array (
-               'language'             => 'Japanese' ,
-               'internal_encoding'    => 'UTF-8' ,
-               'script_encoding'      => 'UTF-8' ,
-               'http_input'           => 'pass' ,
-               'http_output'          => 'sjis' ,
-               'substitute_character' => 'none' ,
-),
+
 	/**
 	 * base_url - The base URL of the application.
 	 * MUST contain a trailing slash (/)
@@ -72,20 +46,20 @@ return array(
 	 *
 	 * Set this to 'index.php if you don't use URL rewriting
 	 */
-	// 'index_file' => false,
+	 'index_file' => false,
 
 	// 'profiling'  => false,
 
 	/**
 	 * Default location for the file cache
 	 */
-	// 'cache_dir'       => APPPATH.'cache/',
+	 'cache_dir'       => APPPATH.'cache/',
 
 	/**
 	 * Settings for the file finder cache (the Cache class has it's own config!)
 	 */
 	// 'caching'         => false,
-	// 'cache_lifetime'  => 3600, // In Seconds
+	 'cache_lifetime'  => 3600, // In Seconds
 
 	/**
 	 * Callback to use with ob_start(), set this to 'ob_gzhandler' for gzip encoding of output
@@ -107,13 +81,15 @@ return array(
 	 * Localization & internationalization settings
 	 */
 	// 'language'           => 'en', // Default language
+	 'language'           => 'ja', // Default language
 	// 'language_fallback'  => 'en', // Fallback language when file isn't available for default language
 	// 'locale'             => 'en_US', // PHP set_locale() setting, null to not set
+	'locale'             => null, // PHP set_locale() setting, null to not set
 
 	/**
 	 * Internal string encoding charset
 	 */
-	// 'encoding'  => 'UTF-8',
+	 'encoding'  => 'UTF-8',
 
 	/**
 	 * DateTime settings
@@ -122,7 +98,8 @@ return array(
 	 * default_timezone		optional, if you want to change the server's default timezone
 	 */
 	// 'server_gmt_offset'  => 0,
-	// 'default_timezone'   => null,
+	// 'default_timezone'   => 'UTC',
+	'default_timezone'   => 'Asia/Tokyo',
 
 	/**
 	 * Logging Threshold.  Can be set to any of the following:
@@ -137,6 +114,7 @@ return array(
 	// 'log_threshold'    => Fuel::L_WARNING,
 	// 'log_path'         => APPPATH.'logs/',
 	// 'log_date_format'  => 'Y-m-d H:i:s',
+	'log_threshold'    => Fuel::L_ALL,
 
 	/**
 	 * Security settings
@@ -268,10 +246,11 @@ return array(
 	// 	//PKGPATH
 	// ),
 
+
 	/**************************************************************************/
 	/* Always Load                                                            */
 	/**************************************************************************/
-	 'always_load'  => array(
+	// 'always_load'  => array(
 
 		/**
 		 * These packages are loaded on Fuel's startup.
@@ -284,10 +263,9 @@ return array(
 		 *     array('auth'	=> PKGPATH.'auth/')
 		 * );
 		 */
-		 'packages'  => array(
-		 	'orm',
-		 	'log',
-		 ),
+		// 'packages'  => array(
+		// 	//'orm',
+		// ),
 
 		/**
 		 * These modules are always loaded on Fuel's startup. You can specify them
@@ -323,11 +301,6 @@ return array(
 		 * If you don't want the lang in a group use null as groupname.
 		 */
 		// 'language'  => array(),
-
-         
-         
-         
-         
-         ),
+	// ),
 
 );
