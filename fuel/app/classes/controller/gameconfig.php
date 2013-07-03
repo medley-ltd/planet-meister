@@ -39,7 +39,8 @@ class Controller_Gameconfig extends Controller_Rest{
             // バナーデータを取得
             $game_config['illust'] =array('illust/ills00.png','illust/banner_an.gif');
 
-
+            //
+            $game_config['unixtime'] = time();
 
             // ステータス判定
             $game_config['status'] = 'OK';

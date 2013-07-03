@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 use Log\Log;
-class Controller_User extends Controller
+class Controller_User extends Controller_JsonCommon
 {
     
     //フラグ詳細　registered
@@ -32,7 +32,7 @@ class Controller_User extends Controller
         'base_wis'=> '10',
         //'current_job_id'=> '',
         'current_avatar_id'=> '000001',
-        'current_weapon_id'=> '000001',
+        'current_weapon_id'=> '000001',//
         
     );
     
@@ -67,19 +67,28 @@ class Controller_User extends Controller
     public function action_entry($nico_id = null ,$name = null){
 
         // nico_id チェック
-        if($this->action_checkById($nico_id) != self::USER_NOTENTRY){
-            return false;
+        $nico_id = Input::get('nico_viewer_id');
+        
+        if(!$nico_id){
+            $data['status'] = 'NG';
+            $data['message'] = 'ユーザーID取得に失敗(USR-Ent 01)';
+            Util_Jsonio::output($data);
+            return ;
         }
         
-        //なまえチェック
-        if(!$name){
+  /*      if($this->action_checkById($nico_id) != self::USER_NOTENTRY){
             return false;
         }
-
+ */       
+        //なまえチェック
+/*        if(!$name){
+            return false;
+        }
+*/
         $model_userdata = new Model_UserData();
         $entry_base = self::$_base_status;
         $entry_base['nico_id'] = $nico_id;
-        $entry_base['name'] = $name;
+        $entry_base['name'] = 'default';
         
         //nicoAPIよりニコポを取得する
         $entry_base['sap_money'] =0;
@@ -93,6 +102,8 @@ class Controller_User extends Controller
         $model_userdata->set($entry_base);
         $model_userdata->save();
         
+        $data['status'] = 'OK';
+        Util_Jsonio::output($data);
         
     }
     
@@ -134,21 +145,49 @@ class Controller_User extends Controller
      /*
       * ユーザーステータス取得
       */
-     public function action_status($nico_id = null){
+     public function get_status(){
          
-     
+         //try {
+             
+            //request パラメータにIDが入ってた場合はユーザー指定 
+            $nico_id = Util_Jsonio::get('id'); 
+            $gettype ='friend';
+
+            //自身のデータを取得する
+            if(!$nico_id){
+                $nico_id = Input::get('nico_viewer_id');
+                $gettype ='owner';
+            }
+
+            if(!$nico_id){
+                $data['status'] = 'NG';
+                $data['message'] = 'ユーザーID取得に失敗(USR-Sta 01)';
+                Util_Jsonio::output($data);
+                //throw new Exception('ユーザーID取得に失敗(USR-Sta 01)');
+                
+                return;
+            }
+             
+         //} catch (Exception $exc) {
+             //echo $exc->getTraceAsString();
+         //       throw new Exception('予期せぬエラーが発生しました(USR-Sta 02)');
+             
+         //}
+
+
+/*
         //IDを取得
-        $request = Util_Jsonio::get('id'); 
+        $nico_id	= Util_Jsonio::get('id');
         $gettype = null; 
-        if(empty($request->id)){
+        if(!$nico_id){
             // 自ユーザー APIを通す
-            $nico_id = '1';
+            $nico_id = '1';     //デバッグ用
             $gettype ='owner';
         }else{
-            $nico_id = $nico_id->id;
+            //$nico_id = $nico_id->id;
             $gettype ='friend';
         }
-        
+ */       
         $model_userdata = new Model_UserData();
         $model_userjob = new Model_UserJob();
 
@@ -227,20 +266,21 @@ class Controller_User extends Controller
          /*$post_data1 =  \Fuel\Core\Input::post();
          var_dump($post_data1);
 */
-         $post_data = file_get_contents("php://input");
-         Log::error('var_dump->'.var_dump($post_data));
-         
-         
-         $id = \Fuel\Core\Input::json('id','_ID-GET-ERR_');
-         $process = \Fuel\Core\Input::json('process','_PROCESS-GET-ERR_');
-         Log::error('$id->'.$id);
+        $nico_id = Input::get('nico_viewer_id'); 
+		$this->data['id']	= Util_Jsonio::get('id');
+		$this->data['process']	= Util_Jsonio::get('process');
+        
+        //パラメータチェック
+        if($this->data['id'] != $nico_id){
+            
+            //パラメータエラー
+            
+            return;
+        }
 
-         
-         $data =array();
-         $data['process'] = $process;
-         $data['id'] = $id;
-                 
-         
+        
+        
+        
 /*         
          //NICO APIからnico_id取得
          if(!$nico_id){
@@ -259,10 +299,23 @@ class Controller_User extends Controller
 
      
      public function get_job($nico_id = null){
+         
          $model_user_job = new Model_UserJob();
          $model_job_mst = new Model_jobMst();
-         Log::error($nico_id);
-         $nico_id=1;
+         
+         // APIよりnico_id取得
+
+         $nico_id = 1;  //デバッグ用
+         
+         if(!$nico_id){
+    
+             // エラー
+             $response['status'] = 'NG';
+             $response['message'] = 'user-id取得エラー(UJ-01)';
+             Util_Jsonio::output($response);
+             return;
+         }
+         
          $ret = $model_user_job->getByUserJoblist($nico_id);
          
          foreach ($ret as $list) {
@@ -310,7 +363,9 @@ class Controller_User extends Controller
          $ret_data['status'] ='OK';
          $ret_data['job'] =$job_list;
          
-         $this->response($ret_data);
+         
+         Util_Jsonio::output($ret_data);
+         //$this->response($ret_data);
          
          
      }
@@ -319,85 +374,97 @@ class Controller_User extends Controller
      *  ユーザー所持アイテム 
      */
      public function get_item(){
+        
+        $request = Util_Jsonio::get("request","json_decode");
+        
+        //nico_id取得
+        $nico_id=1; 
 
+        
+        /*
+        if(empty($request->id)){
+            $response['status'] = 'NG';
+            $response['message'] = 'user-id取得エラー(UI-01)';
+            Util_Jsonio::output($response);
+            return;
+        }
+         
+         */
+        
+        if(empty($request->act)){
+            $response['status'] = 'NG';
+            $response['message'] = 'act取得エラー(UI-02)';
+            Util_Jsonio::output($response);
+            return;
+        }
+
+        /*
         $nico_id=1; 
         $item_id = 'Z00003';
         //$item_id=null;
         $amount = 1;
         $action = 'del';
         
+        $request = new stdClass();
+        $request->act='add';
+        $request->id= 'Z00004';
+        $request->number= '10';
+        */
+        
         //アイテムIDの指定がなく追加、減算をする場合はエラー
-        if($action=='add' || $action == 'del'){
-            if(!$item_id){
-                //item_id取得エラー
+        if($request->act=='add' || $request->act == 'del'){
+            if(empty($request->id)){
+                $response['status'] = 'NG';
+                $response['message'] = 'item-id取得エラー(UI-03)';
+                Util_Jsonio::output($response);
+                return;
+            }
+            if(empty($request->number)){
+                $response['status'] = 'NG';
+                $response['message'] = '個数取得エラー(UI-04)';
+                Util_Jsonio::output($response);
+                return;
+            }elseif($request->number < 1){
+                $response['status'] = 'NG';
+                $response['message'] = '個数取得エラー(UI-05)';
+                Util_Jsonio::output($response);
                 return;
             }
         }
         
         //ユーザー所持品
         $model_useritem = new Model_UserItem();
-
         
-
-        $ret = $model_useritem->setItem($action, $nico_id, $item_id, $amount);
-        
-//        $ret['message'] = mb_convert_encoding($ret['message'], "SJIS", "UTF-8");
-        
-        echo json_encode($ret);
-        
-        //$this->response($ret);
-        //$row = $model_useritem->getByUserItem($nico_id,$item_id);
-
-        
-        /*
-        
-        switch ($action) {
-            
-            case 'add':
-                DB::query('INSERT INTO user_item (id, nico_id, type, item_id, amount, update_date, insert_date) 
-                    VALUES (NULL, %d, %d, %d, now(), now()) ON DUPLICATE KEY UPDATE amount= amount + 1)');
-                
-                $model_useritem->set(array(
-                            'nico_id' => $row[0]['nico_id'],
-                            'item_id' => $row[0]['item_id'],
-                            'amount' => $row[0]['amount']+1,
-                            ) 
-                        );
-                $model_useritem->save();
-                //$ret = $model_userdata->update($user_param_array);
-
-                break;
-            case 'del':
-                if(!$row){
-                    //アイテムがないのに消化しようとしているケース
-                    return;
-                }
-                
-                break;
-            default:
-                break;
+        if($request->act=='add' || $request->act == 'del'){
+            if(!$model_useritem->setItem($request->act, $nico_id, $request->id, $request->number)){
+                $response['status'] = 'NG';
+                $response['message'] = 'add/del エラー(UI-05)';
+                Util_Jsonio::output($response);
+                return;
+            }
         }
         
-        
-        $row = $model_useritem->getByUserItem($nico_id,$item_id);
+        //getはここで取得
+        $row = $model_useritem->getByUserItem($nico_id, $request->id);
+        if($row){
+            $ret['status'] = 'OK';
+            $ret['id'] = $row[0]['item_id'];
+            $ret['number'] = $row[0]['amount'];
+        }else{
+            $ret['status'] = 'OK';
+            $ret['id'] = $request->id;
+            $ret['number'] = '0';
+        }
 
-        /*
-        $user_param_array['nico_id'] =$nico_id;
-        //$user_param_array['name'] ='てすと';
-        $user_param_array['money']='1000';
-        $ret = $model_userdata->update($user_param_array);
-*/
-        
-        //var_dump($row);
-        
-         //$this->response($row);
+        //JSON形式で出力
+        Util_Jsonio::output($ret);
          
      }
 
      /*
       * ユーザーアイテムを取得しJSONレイアウトに生成する
       */
-     public function action_getUserItem($nico_id,$item_id = null){
+     public function get_getUserItem($nico_id,$item_id = null){
         //ユーザー所持品
         $model_useritem = new Model_UserItem();
 
@@ -409,6 +476,27 @@ class Controller_User extends Controller
         }
          return $user_item;
      }
+     
+     
+     public function get_avatar(){
+         
+         //userjobid を取得する
+         
+         $user_job_id = 1;
+         $nico_id = 1;
+         
+         $model_user_job = new Model_UserJob();
+         $job = $model_user_job->getByUserJobId($user_job_id);
+         
+         $model_user_item = new Model_UserItem();
+         $ret = $model_user_item->getByUserAvatar($nico_id, $job['job_id']);
+         
+        //JSON形式で出力
+        Util_Jsonio::output($ret);
+         
+         
+     }
+     
      
     //-------------------------------------------------------------------------
     // ユーティリティ系
@@ -458,29 +546,6 @@ class Controller_User extends Controller
         return parent::after($response);
     }
   */  
-    // UTF-8文字列をUnicodeエスケープする。ただし英数字と記号はエスケープしない。
-    function unicode_decode($str) {
-      return preg_replace_callback("/((?:[^\x09\x0A\x0D\x20-\x7E]{3})+)/", array($this,"decode_callback"), $str);
-    }
-
-    function decode_callback($matches) {
-      $char = mb_convert_encoding($matches[1], "UTF-16", "UTF-8");
-      $escaped = "";
-      for ($i = 0, $l = strlen($char); $i < $l; $i += 2) {
-        $escaped .=  "\u" . sprintf("%02x%02x", ord($char[$i]), ord($char[$i+1]));
-      }
-      return $escaped;
-    }
-
-    // Unicodeエスケープされた文字列をUTF-8文字列に戻す
-    function unicode_encode($str) {
-      return preg_replace_callback("/\\\\u([0-9a-zA-Z]{4})/", array($this,"encode_callback"), $str);
-    }
-
-    function encode_callback($matches) {
-      $char = mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UTF-16");
-      return $char;
-    }
 
     
     

@@ -6,13 +6,38 @@
  */
 
 /**
- * Description of ItemMst
+ * Description of SkilMst
  *
  * @author nimu.co
  */
-class Model_ItemMst extends Model {
+class Model_SkillMst extends \Fuel\Core\Model_Crud {
     //put your code here
-    protected static $_table_name = 'item_mst';
+    protected static $_table_name = 'skill_mst';
+    
+    
+    
+    /*
+     * スキルデータを全件取得してくる
+     */
+    public function getSkill($skill_id = null){
+
+        $query = Fuel\Core\DB::select()
+                                ->from(self::$_table_name);
+        //スキルIDが指定ある場合        
+        if($skill_id){
+            $query->where('skill_id',$skill_id);
+        }
+
+        $result_row = $query->execute()->as_array();
+        
+        if(!$result_row){
+            return null;
+        }        
+        
+        return $result_row;
+        
+    }
+        
     
     /*
      * get()
@@ -20,83 +45,9 @@ class Model_ItemMst extends Model {
      * @param $nico_id int
      * nimu.co
      */
-    public function get($item_id){
+    public function getBylist($skill_id){
         
-        if(is_array($item_id)){
-            return self::find('all',array('where' ,'IN', $item_id));    
-        }else{
-            return self::find('all',array('where' => $item_id));
-        }
-
-        return null;
-    }
-    
-    /*
-     * 消費アイテムを全件取得してくる
-     */
-    public function getConsumerItem($item_id = null){
-
-        $query = Fuel\Core\DB::select()
-                                ->from(self::$_table_name)
-                                ->where('item_type','C');
-        //アイテムIDが指定ある場合        
-        if($item_id){
-            $query->where('item_id',$item_id);
-        }
-
-        $result_row = $query->execute()->as_array();
-        
-        if(!$result_row){
-            return null;
-        }        
-        
-        return $result_row;
-        
-    }
-    
-    /*
-     * 武器データを全件取得してくる
-     */
-    public function getWeapon($item_id = null){
-
-        $query = Fuel\Core\DB::select()
-                                ->from(self::$_table_name)
-                                ->where('item_type','W');
-        //アイテムIDが指定ある場合        
-        if($item_id){
-            $query->where('item_id',$item_id);
-        }
-
-        $result_row = $query->execute()->as_array();
-        
-        if(!$result_row){
-            return null;
-        }        
-        
-        return $result_row;
-        
-    }
-    /*
-     * アバターデータを全件取得してくる
-     */
-    public function getAvatar($item_id = null){
-
-        $query = Fuel\Core\DB::select()
-                                ->from(self::$_table_name)
-                                ->where('item_type','A');
-        //アイテムIDが指定ある場合        
-        if($item_id){
-            $query->where('item_id',$item_id);
-        }
-
-        $result_row = $query->execute()->as_array();
-        
-        if(!$result_row){
-            return null;
-        }        
-        
-        return $result_row;
-        
+        return self::find('skill_id',$skill_id);    
     }
     
     /*

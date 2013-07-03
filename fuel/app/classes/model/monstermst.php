@@ -6,13 +6,38 @@
  */
 
 /**
- * Description of ItemMst
+ * Description of MonsterMst
  *
  * @author nimu.co
  */
-class Model_ItemMst extends Model {
+class Model_MonsterMst extends Model {
     //put your code here
-    protected static $_table_name = 'item_mst';
+    protected static $_table_name = 'monster_mst';
+    
+    
+    
+/*
+     * アバターデータを全件取得してくる
+     */
+    public function getMonster($monster_id = null){
+
+        $query = Fuel\Core\DB::select()
+                                ->from(self::$_table_name);
+        //アイテムIDが指定ある場合        
+        if($monster_id){
+            $query->where('monster_id',$monster_id);
+        }
+
+        $result_row = $query->execute()->as_array();
+        
+        if(!$result_row){
+            return null;
+        }        
+        
+        return $result_row;
+        
+    }
+        
     
     /*
      * get()
@@ -29,74 +54,6 @@ class Model_ItemMst extends Model {
         }
 
         return null;
-    }
-    
-    /*
-     * 消費アイテムを全件取得してくる
-     */
-    public function getConsumerItem($item_id = null){
-
-        $query = Fuel\Core\DB::select()
-                                ->from(self::$_table_name)
-                                ->where('item_type','C');
-        //アイテムIDが指定ある場合        
-        if($item_id){
-            $query->where('item_id',$item_id);
-        }
-
-        $result_row = $query->execute()->as_array();
-        
-        if(!$result_row){
-            return null;
-        }        
-        
-        return $result_row;
-        
-    }
-    
-    /*
-     * 武器データを全件取得してくる
-     */
-    public function getWeapon($item_id = null){
-
-        $query = Fuel\Core\DB::select()
-                                ->from(self::$_table_name)
-                                ->where('item_type','W');
-        //アイテムIDが指定ある場合        
-        if($item_id){
-            $query->where('item_id',$item_id);
-        }
-
-        $result_row = $query->execute()->as_array();
-        
-        if(!$result_row){
-            return null;
-        }        
-        
-        return $result_row;
-        
-    }
-    /*
-     * アバターデータを全件取得してくる
-     */
-    public function getAvatar($item_id = null){
-
-        $query = Fuel\Core\DB::select()
-                                ->from(self::$_table_name)
-                                ->where('item_type','A');
-        //アイテムIDが指定ある場合        
-        if($item_id){
-            $query->where('item_id',$item_id);
-        }
-
-        $result_row = $query->execute()->as_array();
-        
-        if(!$result_row){
-            return null;
-        }        
-        
-        return $result_row;
-        
     }
     
     /*

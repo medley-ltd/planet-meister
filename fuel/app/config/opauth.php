@@ -89,5 +89,9 @@ return array(
             'key' => 'ggcOMewgkBlGHMtxi2frJg',
             'secret' => 'WUxWLsUlrtzr8h1MHSeJvR3hQ3RDLkELiDI7fhYY'
         ),
+        'nico' => array(
+            'key' => '',
+            'secret' => 'WUxWLsUlrtzr8h1MHSeJvR3hQ3RDLkELiDI7fhYY'
+        ),
     ),     
 );

@@ -15,6 +15,31 @@ use Log\Log;
 class Model_jobMst extends \Fuel\Core\Model_Crud{
     //put your code here
     protected static $_table_name = 'job_mst';
+
+    /*
+     * ジョブデータを全件取得してくる
+     */
+    public function getJob($job_id = null){
+
+        $query = Fuel\Core\DB::select()
+                                ->from(self::$_table_name);
+        //ジョブIDが指定ある場合        
+        if($job_id){
+            $query->where('job_id',$job_id);
+        }
+
+        $result_row = $query->execute()->as_array();
+        
+        if(!$result_row){
+            return null;
+        }        
+        
+        return $result_row;
+        
+    }
+    
+    
+    
     
     /*
      * get()

@@ -7,7 +7,7 @@ class Controller_Auth extends Controller
 	{
 		Package::load( 'opauth' );
 
-		if ( !isset( $this->_config ) )
+            if ( !isset( $this->_config ) )
 		{
 			$this->_config = Config::load( 'opauth', 'opauth' );
 		}

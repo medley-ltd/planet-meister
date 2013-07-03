@@ -84,6 +84,24 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
         }
     }
     
+    /*
+     * updateTurtrial
+     * チュートリアル更新
+     * 
+     */
+    public function updateTurtrial($nico_id , $status){
+        
+        $query = Fuel\Core\DB::update(self::$_table_name);
+
+        $query->value('turtrial',$status);
+        
+        $query->where('nico_id',$nico_id);
+        $result = $query->execute();
+        return $result;
+        
+    }
+    
+    
     
     /*
      * levelup()
@@ -91,19 +109,16 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
      * @param $nico_id int
      * nimu.co
      */
-    public function update($user_param_array){
-    
-        //nico_idのチェック
-        if(isset($user_param_array['nico_id'])){
-            if(!$user_param_array['nico_id']){
-                return false;
-            }
-        }else{
-            return false;
-        }
 
-        //対象ユーザーのuser_dataを取得
-        //$user_dt = $this->get($user_param_array['nico_id']);
+    /*
+     * update()
+     * ユーザーデータ更新
+     * @param $nico_id array
+     * nimu.co
+     */
+    public function update($user_param_array){
+        
+        $user_dt = $this->get($user_param_array['nico_id']);
         
         $query = Fuel\Core\DB::update('user_data');
 
@@ -111,12 +126,15 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
         if(isset($user_param_array['name'])){
             $query->value('name',$user_param_array['name']);
         }
-
+        /*
+        if($user_param_array['level']){
+            $query->value('level',$user_dt['level'] + 1 );
+        }
+        */
         //EXP更新
         if(isset($user_param_array['exp'])){
             $query->value('exp', $user_param_array['exp']);
         }
-
         //課金額更新
         if(isset($user_param_array['sap_money'])){
             $query->value('sap_money',$user_param_array['sap_money']);
@@ -125,13 +143,14 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
         //ゲーム内マネー更新
         if(isset($user_param_array['money'])){
             $query->value('money',$user_param_array['money']);
+            $query->value('money',$user_dt['money'] + $user_param_array['money']);
         }
 
         //現在スタミナ更新
         if(isset($user_param_array['now_stamina'])){
             $query->value('now_stamina',$user_param_array['now_stamina']);
         }
-        
+
         //最大スタミナ更新 LV-UP時
         if(isset($user_param_array['max_stamina'])){
             $query->value('max_stamina',$user_param_array['max_stamina']);
@@ -141,7 +160,7 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
         if(isset($user_param_array['stamina_last_recovery_date'])){
             $query->value('stamina_last_recovery_date',$user_param_array['stamina_last_recovery_date']);
         }
-        
+
         //ST-pt更新
         if(isset($user_param_array['status_pt'])){
             $query->value('status_pt',$user_param_array['status_pt']);
@@ -156,12 +175,12 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
         if(isset($user_param_array['friend_count'])){
             $query->value('friend_count',$user_param_array['friend_count']);
         }
-        
+
         //フレンド最大数更新
         if(isset($user_param_array['friend_max_count'])){
             $query->value('friend_max_count',$user_param_array['friend_max_count']);
         }
-        
+
         //基本HP更新
         if(isset($user_param_array['base_hp'])){
             $query->value('base_hp',$user_param_array['base_hp']);
@@ -171,17 +190,17 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
         if(isset($user_param_array['base_mp'])){
             $query->value('base_mp',$user_param_array['base_mp']);
         }
-        
+
         //基本att更新
         if(isset($user_param_array['base_att'])){
             $query->value('base_att',$user_param_array['base_att']);
         }
-        
+
         //基本spd更新
         if(isset($user_param_array['base_spd'])){
             $query->value('base_spd',$user_param_array['base_spd']);
         }
-        
+
         //基本def更新
         if(isset($user_param_array['base_def'])){
             $query->value('base_def',$user_param_array['base_def']);
@@ -212,20 +231,11 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
             $query->value('profile_comment',$user_param_array['profile_comment']);
         }
 
-        //最終ログイン日時更新
-        if(isset($user_param_array['last_login_date'])){
-            $query->value('last_login_date',$user_param_array['last_login_date']);
-        }
-        
         //更新日付の更新
         $query->value('update_date',date('Y-m-d H:i:s'));
-        
-        //where条件
-        $query->where('nico_id',$user_param_array['nico_id']);
-        
-        //SQL実行
-        $result = $query->execute();
 
+        $query->where('nico_id',$user_param_array['nico_id']);
+        $result = $query->execute();
         return $result;
         
     }
