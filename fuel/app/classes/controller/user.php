@@ -43,25 +43,6 @@ class Controller_User extends Controller_JsonCommon
     }
 
     /*
-     *  テスト用　オートインサート
-     */
-    public function action_auto_insert(){
-        for ($i = 0; $i < 10 ; $i++)
-        {
-            $post = Model_Post::forge();
-            
-            $row = array();
-            $row['title'] = $i .'番目の投稿の件名';
-            $row['summary'] = $i .'番目の投稿の概要';
-            $row['body'] = 'これは' . $i .'番目の投稿です' . '¥n' . 'テストで自動投稿しています。';
-            
-            $post->set($row);
-            $result = $post->save();
-        }
-        
-        echo 'Finished!';
-    }
-    /*
      *  ユーザー登録
      */
     public function action_entry($nico_id = null ,$name = null){
@@ -174,20 +155,6 @@ class Controller_User extends Controller_JsonCommon
              
          //}
 
-
-/*
-        //IDを取得
-        $nico_id	= Util_Jsonio::get('id');
-        $gettype = null; 
-        if(!$nico_id){
-            // 自ユーザー APIを通す
-            $nico_id = '1';     //デバッグ用
-            $gettype ='owner';
-        }else{
-            //$nico_id = $nico_id->id;
-            $gettype ='friend';
-        }
- */       
         $model_userdata = new Model_UserData();
         $model_userjob = new Model_UserJob();
 
@@ -278,94 +245,84 @@ class Controller_User extends Controller_JsonCommon
             return;
         }
 
+        //データ更新
+        $model_user_data = new Model_UserData();
+        if(!$model_user_data->updateTurtrial($nico_id, $status)){
+            // 更新エラー
+            return;
+        }
         
-        
-        
-/*         
-         //NICO APIからnico_id取得
-         if(!$nico_id){
-             
-             $nico_id = 1;
-             
-             //return false;
-         }
-         $user = Model_UserData::find($nico_id);
-         $user->set(array('turtrial' => $status,
-                          'update_date' => date()));
-         $user->save();
-*/
          $this->response($data);
     }     
 
      
      public function get_job($nico_id = null){
          
-         $model_user_job = new Model_UserJob();
-         $model_job_mst = new Model_jobMst();
-         
-         // APIよりnico_id取得
+        // APIよりnico_id取得
+        $nico_id = Input::get('nico_viewer_id'); 
+        $nico_id = 1;  //デバッグ用
 
-         $nico_id = 1;  //デバッグ用
-         
-         if(!$nico_id){
-    
-             // エラー
-             $response['status'] = 'NG';
-             $response['message'] = 'user-id取得エラー(UJ-01)';
-             Util_Jsonio::output($response);
-             return;
-         }
-         
-         $ret = $model_user_job->getByUserJoblist($nico_id);
-         
-         foreach ($ret as $list) {
-             
-             $job_data['id'] = $list['user_job_id'];
-         //Log::error('job_id->'.$list['job_id']);
-         //Log::error('level->'.$list['level']);
-             
-             //JOBマスタから取得
-             $jobmst = $model_job_mst->getJobData($list['job_id'],$list['level'],$list['exp']);
-             
-             $job_data['name'] = $jobmst['job_name'];
-             $job_data['level'] = $list['level'];
+        if(!$nico_id){
 
-             $job_data['ismax'] = $jobmst['ismax'];
-             $job_data['explevup'] = $jobmst['explvup'];
-             $job_data['nextskill'] = $jobmst['nextskill'];
-             $job_data['nextskilllevel'] = $jobmst['nextskilllevel'];
-             
-             $job_data['hp'] = $list['passive_hp'];
-             $job_data['mp'] = $list['passive_mp'];
-             $job_data['att'] = $list['passive_att'];
-             $job_data['spd'] = $list['passive_spd'];
-             $job_data['def'] = $list['passive_def'];
-             $job_data['wis'] = $list['passive_wis'];
-             $skill_list =  array();
-             if($list['skill_id_1']){
-                 $skill_list[]=$list['skill_id_1'];
-             }
-             if($list['skill_id_2']){
-                 $skill_list[]=$list['skill_id_2'];
-             }
-             if($list['skill_id_3']){
-                 $skill_list[]=$list['skill_id_3'];
-             }
-             if($list['skill_id_4']){
-                 $skill_list[]=$list['skill_id_4'];
-             }
-             $job_data['skill'] = $skill_list;
-             
-             $job_list[]=$job_data;
-         }
+            // エラー
+            $response['status'] = 'NG';
+            $response['message'] = 'user-id取得エラー(UJ-01)';
+            Util_Jsonio::output($response);
+            return;
+        }
+
+        $model_user_job = new Model_UserJob();
+        $model_job_mst = new Model_jobMst();
+        $ret = $model_user_job->getByUserJoblist($nico_id);
          
-         $ret_data = array();
-         $ret_data['status'] ='OK';
-         $ret_data['job'] =$job_list;
-         
-         
-         Util_Jsonio::output($ret_data);
-         //$this->response($ret_data);
+        foreach ($ret as $list) {
+
+            $job_data['id'] = $list['user_job_id'];
+        //Log::error('job_id->'.$list['job_id']);
+        //Log::error('level->'.$list['level']);
+
+            //JOBマスタから取得
+            $jobmst = $model_job_mst->getJobData($list['job_id'],$list['level'],$list['exp']);
+
+            $job_data['name'] = $jobmst['job_name'];
+            $job_data['level'] = $list['level'];
+
+            $job_data['ismax'] = $jobmst['ismax'];
+            $job_data['explevup'] = $jobmst['explvup'];
+            $job_data['nextskill'] = $jobmst['nextskill'];
+            $job_data['nextskilllevel'] = $jobmst['nextskilllevel'];
+
+            $job_data['hp'] = $list['passive_hp'];
+            $job_data['mp'] = $list['passive_mp'];
+            $job_data['att'] = $list['passive_att'];
+            $job_data['spd'] = $list['passive_spd'];
+            $job_data['def'] = $list['passive_def'];
+            $job_data['wis'] = $list['passive_wis'];
+            $skill_list =  array();
+            if($list['skill_id_1']){
+                $skill_list[]=$list['skill_id_1'];
+            }
+            if($list['skill_id_2']){
+                $skill_list[]=$list['skill_id_2'];
+            }
+            if($list['skill_id_3']){
+                $skill_list[]=$list['skill_id_3'];
+            }
+            if($list['skill_id_4']){
+                $skill_list[]=$list['skill_id_4'];
+            }
+            $job_data['skill'] = $skill_list;
+
+            $job_list[]=$job_data;
+        }
+
+        $ret_data = array();
+        $ret_data['status'] ='OK';
+        $ret_data['job'] =$job_list;
+
+
+        Util_Jsonio::output($ret_data);
+        //$this->response($ret_data);
          
          
      }
@@ -375,6 +332,7 @@ class Controller_User extends Controller_JsonCommon
      */
      public function get_item(){
         
+        $nico_id = Input::get('nico_viewer_id'); 
         $request = Util_Jsonio::get("request","json_decode");
         
         //nico_id取得

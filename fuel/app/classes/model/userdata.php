@@ -94,6 +94,7 @@ class Model_UserData extends \Fuel\Core\Model_Crud {
         $query = Fuel\Core\DB::update(self::$_table_name);
 
         $query->value('turtrial',$status);
+        $query->value('update_date','now()');
         
         $query->where('nico_id',$nico_id);
         $result = $query->execute();
